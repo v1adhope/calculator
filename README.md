@@ -6,3 +6,5 @@ The fmt library did not capture all of the miss-entry cases, so the bufio librar
 
 - Result 0 = nil
 - No used complex opirations of the math library
+
+![preview](/assets/preview.png)
