@@ -1,10 +1,12 @@
-// NOTE: 0 = nil
 package calculator
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const WrongSyntax = "wrong syntax, see examples"
 
+// Consistency is important, only for expansion
 var Operations = [...]string{"add", "sub", "div", "mul"}
 
 type calculator struct {
@@ -14,23 +16,6 @@ type calculator struct {
 
 func New() *calculator {
 	return &calculator{}
-}
-
-func Eg() {
-	fmt.Println("\nExample:")
-	fmt.Println("\tPrint action:")
-	fmt.Println("\tadd")
-	fmt.Println("\tPrint the first number")
-	fmt.Println("\t12")
-	fmt.Println("\tPrint the next number")
-	fmt.Println("\t10")
-	fmt.Println("\tResult: 22")
-
-	fmt.Println("\n\tPrint action:")
-	fmt.Println("\tdiv")
-	fmt.Println("\tPrint the next number")
-	fmt.Println("\t2")
-	fmt.Println("\tResult: 11")
 }
 
 func (c *calculator) Addition() {
@@ -52,7 +37,7 @@ func (c *calculator) Multiplication() {
 func (c *calculator) Calculate() error {
 	switch c.Action {
 	default:
-		return fmt.Errorf("there is no such action")
+		return fmt.Errorf("unknown action")
 	case Operations[0]:
 		c.Addition()
 	case Operations[1]:

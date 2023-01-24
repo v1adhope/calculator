@@ -1,11 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strconv"
-	"strings"
 
 	"github.com/fatih/color"
 	"github.com/v1adhope/calculator/internal/calculator"
@@ -13,61 +9,64 @@ import (
 
 func main() {
 	calc := calculator.New()
+
 	greenFMT := color.New(color.FgGreen, color.Bold)
-	keyword := greenFMT.SprintFunc()
 	magentaFMT := color.New(color.FgHiMagenta, color.Bold)
 	redFMT := color.New(color.FgRed, color.Bold)
+	yellowFMT := color.New(color.FgYellow, color.Bold)
+
+	keywordFMT := greenFMT.SprintFunc()
 
 	fmt.Printf("Prompt: Actions (%s - Addition,  %s - Subtraction, %s - Division, %s - Multiplication)\n",
-		keyword("add"), keyword("sub"), keyword("div"), keyword("mul"))
+		keywordFMT(calculator.Operations[0]),
+		keywordFMT(calculator.Operations[1]),
+		keywordFMT(calculator.Operations[2]),
+		keywordFMT(calculator.Operations[3]))
 	fmt.Println("Prompt: First argument (number a)")
 	fmt.Println("Prompt: Second argument (number b)")
 	fmt.Println("Prompt: Then print an action and a next number to continue")
-	fmt.Printf("Print %s for example, %s for clear the result and %s for exit\n", keyword("eg"), keyword("ac"), keyword("q"))
+	fmt.Printf("Print %s for example, %s for clear the result and %s for exit\n",
+		keywordFMT("eg"),
+		keywordFMT("ac"),
+		keywordFMT("q"))
 
 Loop:
 	for {
 		magentaFMT.Print("\nPrint action: ")
 
-		str, err := bufio.NewReader(os.Stdin).ReadString('\n')
+		var err error
+		calc.Action, err = calculator.ReadAction()
 		if err != nil {
-			redFMT.Println(calculator.WrongSyntax)
+			redFMT.Println(err)
 			continue Loop
 		}
 
-		calc.Action = strings.TrimSuffix(str, "\n")
-
 		switch calc.Action {
+		case "eg":
+			eg(yellowFMT)
+			continue Loop
+		case "ac":
+			calc.AllClear()
+			yellowFMT.Println("Result cleared")
+			continue Loop
+		case "q":
+			break Loop
 		default:
 			if calc.Rez == 0 {
 				magentaFMT.Print("Print the first number: ")
 
-				str, err := bufio.NewReader(os.Stdin).ReadString('\n')
+				calc.Rez, err = calculator.ReadNumber()
 				if err != nil {
-					redFMT.Println(calculator.WrongSyntax)
-					continue Loop
-				}
-
-				str = strings.TrimSuffix(str, "\n")
-				calc.Rez, err = strconv.ParseFloat(str, 64)
-				if err != nil {
-					redFMT.Println(calculator.WrongSyntax)
+					redFMT.Println(err)
 					continue Loop
 				}
 			}
 
 			magentaFMT.Print("Print the next number: ")
 
-			str, err := bufio.NewReader(os.Stdin).ReadString('\n')
+			calc.Val, err = calculator.ReadNumber()
 			if err != nil {
-				redFMT.Println(calculator.WrongSyntax)
-				continue Loop
-			}
-
-			str = strings.TrimSuffix(str, "\n")
-			calc.Val, err = strconv.ParseFloat(str, 64)
-			if err != nil {
-				redFMT.Println(calculator.WrongSyntax)
+				redFMT.Println(err)
 				continue Loop
 			}
 
@@ -78,15 +77,23 @@ Loop:
 			}
 
 			greenFMT.Printf("Result: %v\n", calc.Rez)
-		case "eg":
-			calculator.Eg()
-			continue Loop
-		case "ac":
-			calc.AllClear()
-			redFMT.Println("Result cleared")
-			continue Loop
-		case "q":
-			break Loop
 		}
 	}
+}
+
+func eg(colorFMT *color.Color) {
+	colorFMT.Println("\nExample:")
+	colorFMT.Println("\tPrint action:")
+	colorFMT.Println("\tadd")
+	colorFMT.Println("\tPrint the first number")
+	colorFMT.Println("\t12")
+	colorFMT.Println("\tPrint the next number")
+	colorFMT.Println("\t10")
+	colorFMT.Println("\tResult: 22")
+
+	colorFMT.Println("\n\tPrint action:")
+	colorFMT.Println("\tdiv")
+	colorFMT.Println("\tPrint the next number")
+	colorFMT.Println("\t2")
+	colorFMT.Println("\tResult: 11")
 }
