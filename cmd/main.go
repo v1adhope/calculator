@@ -30,6 +30,8 @@ func main() {
 		keywordFMT("ac"),
 		keywordFMT("q"))
 
+	isFirstRez := true //If the first calculation, suggest entering both numbers
+
 Loop:
 	for {
 		magentaFMT.Print("\nPrint action: ")
@@ -47,12 +49,13 @@ Loop:
 			continue Loop
 		case "ac":
 			calc.AllClear()
+			isFirstRez = true
 			yellowFMT.Println("Result cleared")
 			continue Loop
 		case "q":
 			break Loop
 		default:
-			if calc.Rez == 0 {
+			if isFirstRez {
 				magentaFMT.Print("Print the first number: ")
 
 				calc.Rez, err = calculator.ReadNumber()
@@ -77,6 +80,9 @@ Loop:
 			}
 
 			greenFMT.Printf("Result: %v\n", calc.Rez)
+			if isFirstRez {
+				isFirstRez = false
+			}
 		}
 	}
 }
