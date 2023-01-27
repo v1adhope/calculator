@@ -4,18 +4,28 @@ import (
 	"fmt"
 )
 
-const WrongSyntax = "wrong syntax, see examples"
+const (
+	// Errors
+	WrongSyntax   = "wrong syntax, see examples"
+	UnknownAction = "unknown action"
 
-// Consistency is important, only for expansion
-var Operations = [...]string{"add", "sub", "div", "mul"}
+	// Operations
+	Addition       = "add"
+	Subtraction    = "sub"
+	Division       = "div"
+	Multiplication = "mul"
+	AllClear       = "ac"
+)
 
 type calculator struct {
-	Action   string
-	Rez, Val float64
+	Action        string
+	Rez, Val      float64
+	IsFirstResult bool
 }
 
 func New() *calculator {
-	return &calculator{}
+	//If the first calculation, suggest entering both numbers
+	return &calculator{IsFirstResult: true}
 }
 
 func (c *calculator) Addition() {
@@ -37,20 +47,22 @@ func (c *calculator) Multiplication() {
 func (c *calculator) Calculate() error {
 	switch c.Action {
 	default:
-		return fmt.Errorf("unknown action")
-	case Operations[0]:
+		return fmt.Errorf(UnknownAction)
+	case Addition:
 		c.Addition()
-	case Operations[1]:
+	case Subtraction:
 		c.Subtraction()
-	case Operations[2]:
+	case Division:
 		c.Division()
-	case Operations[3]:
+	case Multiplication:
 		c.Multiplication()
 	}
 
+	c.IsFirstResult = false
 	return nil
 }
 
 func (c *calculator) AllClear() {
 	c.Rez = 0
+	c.IsFirstResult = true
 }

@@ -3,103 +3,98 @@ package main
 import (
 	"fmt"
 
-	"github.com/fatih/color"
 	"github.com/v1adhope/calculator/internal/calculator"
+	"github.com/v1adhope/calculator/internal/colorize"
+)
+
+const (
+	Example = "eg"
+	Exit    = "q"
 )
 
 func main() {
 	calc := calculator.New()
+	colorFMT := colorize.New()
 
-	greenFMT := color.New(color.FgGreen, color.Bold)
-	magentaFMT := color.New(color.FgHiMagenta, color.Bold)
-	redFMT := color.New(color.FgRed, color.Bold)
-	yellowFMT := color.New(color.FgYellow, color.Bold)
-
-	keywordFMT := greenFMT.SprintFunc()
+	GreenKeyword := colorFMT.Green.SprintFunc()
 
 	fmt.Printf("Prompt: Actions (%s - Addition,  %s - Subtraction, %s - Division, %s - Multiplication)\n",
-		keywordFMT(calculator.Operations[0]),
-		keywordFMT(calculator.Operations[1]),
-		keywordFMT(calculator.Operations[2]),
-		keywordFMT(calculator.Operations[3]))
+		GreenKeyword(calculator.Addition),
+		GreenKeyword(calculator.Subtraction),
+		GreenKeyword(calculator.Division),
+		GreenKeyword(calculator.Multiplication))
 	fmt.Println("Prompt: First argument (number a)")
 	fmt.Println("Prompt: Second argument (number b)")
 	fmt.Println("Prompt: Then print an action and a next number to continue")
 	fmt.Printf("Print %s for example, %s for clear the result and %s for exit\n",
-		keywordFMT("eg"),
-		keywordFMT("ac"),
-		keywordFMT("q"))
-
-	isFirstRez := true //If the first calculation, suggest entering both numbers
+		GreenKeyword(Example),
+		GreenKeyword(calculator.AllClear),
+		GreenKeyword(Exit))
 
 Loop:
 	for {
-		magentaFMT.Print("\nPrint action: ")
+		colorFMT.Magenta.Print("\nPrint action: ")
 
 		var err error
 		calc.Action, err = calculator.ReadAction()
 		if err != nil {
-			redFMT.Println(err)
+			colorFMT.Red.Println(err)
 			continue Loop
 		}
 
 		switch calc.Action {
-		case "eg":
-			eg(yellowFMT)
+		case Example:
+			printExample(colorFMT)
 			continue Loop
-		case "ac":
+		case calculator.AllClear:
 			calc.AllClear()
-			isFirstRez = true
-			yellowFMT.Println("Result cleared")
+			colorFMT.Yellow.Println("Result cleared")
 			continue Loop
-		case "q":
+		case Exit:
 			break Loop
 		default:
-			if isFirstRez {
-				magentaFMT.Print("Print the first number: ")
+			if calc.IsFirstResult {
+				colorFMT.Magenta.Print("Print the first number: ")
 
 				calc.Rez, err = calculator.ReadNumber()
 				if err != nil {
-					redFMT.Println(err)
+					colorFMT.Red.Println(err)
 					continue Loop
 				}
 			}
 
-			magentaFMT.Print("Print the next number: ")
+			colorFMT.Magenta.Print("Print the next number: ")
 
 			calc.Val, err = calculator.ReadNumber()
 			if err != nil {
-				redFMT.Println(err)
+				colorFMT.Red.Println(err)
 				continue Loop
 			}
 
 			err = calc.Calculate()
 			if err != nil {
-				redFMT.Println(err)
+				colorFMT.Red.Println(err)
 				continue Loop
 			}
 
-			greenFMT.Printf("Result: %v\n", calc.Rez)
-			if isFirstRez {
-				isFirstRez = false
-			}
+			colorFMT.Green.Printf("Result: %v\n", calc.Rez)
 		}
 	}
 }
 
-func eg(colorFMT *color.Color) {
-	colorFMT.Println("\nExample:")
-	colorFMT.Println("\tPrint action:")
-	colorFMT.Println("\tadd")
-	colorFMT.Println("\tPrint the first number")
-	colorFMT.Println("\t12")
-	colorFMT.Println("\tPrint the next number")
-	colorFMT.Println("\t10")
-	colorFMT.Println("\tResult: 22")
+func printExample(colorFMT *colorize.ColorFMT) {
+	colorFMT.Yellow.Println("\nExample:")
+	colorFMT.Yellow.Println("\tPrint action:")
+	colorFMT.Yellow.Println("\tadd")
+	colorFMT.Yellow.Println("\tPrint the first number")
+	colorFMT.Yellow.Println("\t12")
+	colorFMT.Yellow.Println("\tPrint the next number")
+	colorFMT.Yellow.Println("\t10")
+	colorFMT.Yellow.Println("\tResult: 22")
 
-	colorFMT.Println("\n\tPrint action:")
-	colorFMT.Println("\tdiv")
-	colorFMT.Println("\tPrint the next number")
-	colorFMT.Println("\t2")
-	colorFMT.Println("\tResult: 11")
+	colorFMT.Yellow.Println("\n\tPrint action:")
+	colorFMT.Yellow.Println("\tdiv")
+	colorFMT.Yellow.Println("\tPrint the next number")
+	colorFMT.Yellow.Println("\t2")
+	colorFMT.Yellow.Println("\tResult: 11")
 }
