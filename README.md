@@ -2,8 +2,5 @@
 
 The fmt library did not capture all of the miss-entry cases, so the bufio library was chosen, paired with strings and strconv.
 
-## Current deficiencies
-
-- No used complex opirations of the math library
-
-![preview](/assets/preview.png)
+![base-operations](/assets/base-operations.png)
+Base operations

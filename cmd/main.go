@@ -2,36 +2,24 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/v1adhope/calculator/internal/calculator"
 	"github.com/v1adhope/calculator/internal/colorize"
 )
 
 const (
-	Example = "eg"
-	Exit    = "q"
+	_opExample = "eg"
+	_opExit    = "q"
 )
 
 func main() {
 	calc := calculator.New()
 	colorFMT := colorize.New()
 
-	GreenKeyword := colorFMT.Green.SprintFunc()
+	printManual(colorFMT)
 
-	fmt.Printf("Prompt: Actions (%s - Addition,  %s - Subtraction, %s - Division, %s - Multiplication)\n",
-		GreenKeyword(calculator.Addition),
-		GreenKeyword(calculator.Subtraction),
-		GreenKeyword(calculator.Division),
-		GreenKeyword(calculator.Multiplication))
-	fmt.Println("Prompt: First argument (number a)")
-	fmt.Println("Prompt: Second argument (number b)")
-	fmt.Println("Prompt: Then print an action and a next number to continue")
-	fmt.Printf("Print %s for example, %s for clear the result and %s for exit\n",
-		GreenKeyword(Example),
-		GreenKeyword(calculator.AllClear),
-		GreenKeyword(Exit))
-
-Loop:
 	for {
 		colorFMT.Magenta.Print("\nPrint action: ")
 
@@ -39,27 +27,57 @@ Loop:
 		calc.Action, err = calculator.ReadAction()
 		if err != nil {
 			colorFMT.Red.Println(err)
-			continue Loop
+			continue
 		}
 
 		switch calc.Action {
-		case Example:
+		case _opExit:
+			os.Exit(0)
+		case _opExample:
 			printExample(colorFMT)
-			continue Loop
-		case calculator.AllClear:
+			continue
+		case calculator.OpAllClear:
 			calc.AllClear()
 			colorFMT.Yellow.Println("Result cleared")
-			continue Loop
-		case Exit:
-			break Loop
-		default:
-			if calc.IsFirstResult {
-				colorFMT.Magenta.Print("Print the first number: ")
+			continue
+		case calculator.OpSquareRoot:
+			var choice string
 
-				calc.Rez, err = calculator.ReadNumber()
+			if calc.Res != 0 {
+				colorFMT.Yellow.Print("From the result?(Y/n): ")
+
+				choice, err = calculator.ReadAction()
 				if err != nil {
 					colorFMT.Red.Println(err)
-					continue Loop
+					continue
+				}
+			}
+
+			if strings.EqualFold(choice, "n") || calc.IsFirstRes {
+				colorFMT.Magenta.Print("Print the X number: ")
+
+				calc.Res, err = calculator.ReadNumber()
+				if err != nil {
+					colorFMT.Red.Println(err)
+					continue
+				}
+			}
+
+			err = calc.Calculate()
+			if err != nil {
+				colorFMT.Red.Println(err)
+				continue
+			}
+
+			colorFMT.Green.Printf("Result: %.4v\n", calc.Res)
+		default:
+			if calc.IsFirstRes {
+				colorFMT.Magenta.Print("Print the first number: ")
+
+				calc.Res, err = calculator.ReadNumber()
+				if err != nil {
+					colorFMT.Red.Println(err)
+					continue
 				}
 			}
 
@@ -68,18 +86,37 @@ Loop:
 			calc.Val, err = calculator.ReadNumber()
 			if err != nil {
 				colorFMT.Red.Println(err)
-				continue Loop
+				continue
 			}
 
 			err = calc.Calculate()
 			if err != nil {
 				colorFMT.Red.Println(err)
-				continue Loop
+				continue
 			}
 
-			colorFMT.Green.Printf("Result: %v\n", calc.Rez)
+			colorFMT.Green.Printf("Result: %v\n", calc.Res)
 		}
 	}
+}
+
+func printManual(colorFMT *colorize.ColorFMT) {
+	GreenKeyword := colorFMT.Green.SprintFunc()
+
+	fmt.Printf("Prompt: Base actions (%s - Addition,  %s - Subtraction, %s - Division, %s - Multiplication)\n",
+		GreenKeyword(calculator.OpAddition),
+		GreenKeyword(calculator.OpSubtraction),
+		GreenKeyword(calculator.OpDivision),
+		GreenKeyword(calculator.OpMultiplication))
+	fmt.Printf("Prompt: Extra actions (%s - Square root of result or X)\n",
+		GreenKeyword(calculator.OpSquareRoot))
+	fmt.Println("Prompt: First argument (number a)")
+	fmt.Println("Prompt: Second argument (number b)")
+	fmt.Println("Prompt: Then print an action and a next number to continue")
+	fmt.Printf("Print %s for example, %s for clear the result and %s for exit\n",
+		GreenKeyword(_opExample),
+		GreenKeyword(calculator.OpAllClear),
+		GreenKeyword(_opExit))
 }
 
 func printExample(colorFMT *colorize.ColorFMT) {

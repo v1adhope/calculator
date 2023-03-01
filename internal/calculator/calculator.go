@@ -1,68 +1,75 @@
 package calculator
 
 import (
-	"fmt"
+	"errors"
+	"math"
+)
+
+var (
+	ErrWrongSyntax   = errors.New("wrong syntax, see examples")
+	ErrUnknownAction = errors.New("unknown action")
 )
 
 const (
-	// Errors
-	WrongSyntax   = "wrong syntax, see examples"
-	UnknownAction = "unknown action"
-
-	// Operations
-	Addition       = "add"
-	Subtraction    = "sub"
-	Division       = "div"
-	Multiplication = "mul"
-	AllClear       = "ac"
+	OpAddition       = "add"
+	OpSubtraction    = "sub"
+	OpDivision       = "div"
+	OpMultiplication = "mul"
+	OpSquareRoot     = "sqrt"
+	OpAllClear       = "ac"
 )
 
 type calculator struct {
-	Action        string
-	Rez, Val      float64
-	IsFirstResult bool
+	Action     string
+	Res, Val   float64
+	IsFirstRes bool
 }
 
 func New() *calculator {
-	//If the first calculation, suggest entering both numbers
-	return &calculator{IsFirstResult: true}
+	return &calculator{IsFirstRes: true}
 }
 
 func (c *calculator) Addition() {
-	c.Rez += c.Val
+	c.Res += c.Val
 }
 
 func (c *calculator) Subtraction() {
-	c.Rez -= c.Val
+	c.Res -= c.Val
 }
 
 func (c *calculator) Division() {
-	c.Rez /= c.Val
+	c.Res /= c.Val
 }
 
 func (c *calculator) Multiplication() {
-	c.Rez *= c.Val
+	c.Res *= c.Val
+}
+
+func (c *calculator) SquareRoot() {
+	c.Res = math.Sqrt(c.Res)
 }
 
 func (c *calculator) Calculate() error {
 	switch c.Action {
 	default:
-		return fmt.Errorf(UnknownAction)
-	case Addition:
+		return ErrUnknownAction
+	case OpAddition:
 		c.Addition()
-	case Subtraction:
+	case OpSubtraction:
 		c.Subtraction()
-	case Division:
+	case OpDivision:
 		c.Division()
-	case Multiplication:
+	case OpMultiplication:
 		c.Multiplication()
+	case OpSquareRoot:
+		c.SquareRoot()
 	}
 
-	c.IsFirstResult = false
+	c.IsFirstRes = false
 	return nil
 }
 
 func (c *calculator) AllClear() {
-	c.Rez = 0
-	c.IsFirstResult = true
+	c.Res = 0
+	c.IsFirstRes = true
 }
