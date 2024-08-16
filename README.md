@@ -1,6 +1,5 @@
-```ad-warning
-Use https://numbat.dev/ instead
-```
+> [!WARNING]
+> Use https://numbat.dev/ instead
 
 # Simple CLI calculator
 
